@@ -59,10 +59,10 @@ for(const [id,onLabel,offLabel] of [['call-camera','Turn camera off','Turn camer
 document.querySelector('#call-end').addEventListener('click',()=>{finishCall('Call ended');channel?.postMessage('ended');});
 
 function chooseInterest(interested){
- const confirmation=document.querySelector('#interest-confirmation');confirmation.textContent=interested?'We’ve let Haru know you can’t talk right now, but you’re still interested in talking with them.':'We’ve let Haru know you’re no longer interested.';confirmation.hidden=false;
+
  clearTimeout(ringTimer);clearTimeout(returnTimer);cancelOpening();resetConnectedControls();incoming.classList.remove('ringing');document.querySelector('#availability-prompt').hidden=true;
  interestPrompt.hidden=true;incoming.hidden=true;messages.hidden=false;
- const response=document.createElement('p');response.className='sent-message';response.textContent=interested?'I can’t talk right now, but I’m still interested in talking with Haru.':'No, I’m no longer interested in talking with Haru.';
+ const response=document.createElement('p');response.className='sent-message system-confirmation';response.setAttribute('role','status');response.textContent=interested?'We’ve let Haru know you can’t talk right now, but you’re still interested in talking with them.':'We’ve let Haru know you’re no longer interested in talking with them.';
  document.querySelector('#message-list').append(response);response.scrollIntoView({block:'nearest'});
  channel?.postMessage(interested?'still-interested':'not-interested');
 }
