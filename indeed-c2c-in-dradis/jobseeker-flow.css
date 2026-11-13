@@ -36,3 +36,5 @@
 
 /* Remove device hardware and status chrome from all states. */
 .screen .notch,.screen .ios-status{display:none!important}
+
+.safari-address{margin-top:10px;margin-bottom:10px}
