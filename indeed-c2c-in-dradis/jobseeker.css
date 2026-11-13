@@ -5,3 +5,6 @@
 .shortcuts svg{display:block;width:25px;height:25px}.shortcuts span:first-child svg{width:24px;height:28px}
 
 .indeed-icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}.indeed-icon img{display:block;width:17px;height:21px;object-fit:contain}
+
+/* Frameless, square-edged phone preview. */
+.phone{padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}.screen{border-radius:0}
