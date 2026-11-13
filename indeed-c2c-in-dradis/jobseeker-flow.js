@@ -25,14 +25,14 @@ function startNotification(){
  cancelOpening();
  clearTimeout(ringTimer);deadline=Date.now()+11000;
  lock.hidden=false;messages.hidden=true;incoming.hidden=true;actions.hidden=false;
- status.textContent='Incoming call';
+ status.textContent='Incoming call';incoming.classList.remove('ringing');
  document.querySelector('#message-list').querySelectorAll('.sent-message').forEach(el=>el.remove());
- ringTimer=setTimeout(()=>{cancelOpening();lock.hidden=true;messages.hidden=true;incoming.hidden=false;},11000);
+ ringTimer=setTimeout(()=>{cancelOpening();lock.hidden=true;messages.hidden=true;incoming.hidden=false;incoming.classList.add('ringing');},11000);
 }
-function finishCall(text){cancelOpening();clearTimeout(ringTimer);lock.hidden=true;messages.hidden=true;incoming.hidden=false;status.textContent=text;actions.hidden=true;}
+function finishCall(text){incoming.classList.remove('ringing');cancelOpening();clearTimeout(ringTimer);lock.hidden=true;messages.hidden=true;incoming.hidden=false;status.textContent=text;actions.hidden=true;}
 document.querySelector('.notification').addEventListener('click',openMessages);
 document.querySelector('#replay').addEventListener('click',startNotification);
-document.querySelector('#answer').addEventListener('click',()=>{status.textContent='Call in progress';actions.hidden=true;channel?.postMessage('answered');});
+document.querySelector('#answer').addEventListener('click',()=>{incoming.classList.remove('ringing');status.textContent='Call in progress';actions.hidden=true;channel?.postMessage('answered');});
 document.querySelector('#decline').addEventListener('click',()=>{finishCall('Call declined');channel?.postMessage('declined');});
 document.querySelector('#message-form').addEventListener('submit',event=>{event.preventDefault();const input=document.querySelector('#message-input');if(!input.value.trim())return;const message=document.createElement('p');message.className='sent-message';message.textContent=input.value.trim();document.querySelector('#message-list').append(message);input.value='';message.scrollIntoView({block:'nearest'});});
 if(channel)channel.onmessage=({data})=>{if(data==='start')startNotification();if(data==='ended')finishCall('Call ended');};

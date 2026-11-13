@@ -8,3 +8,8 @@
 
 /* Haru identity and dark in-app call screen. */
 .sender-avatar{background:#111;border:0;overflow:hidden}.sender-avatar img{width:100%;height:100%;display:block}.avatar img{width:100%;height:100%;display:block;border-radius:50%}#incoming{background:radial-gradient(ellipse at 10% 70%,#514035,transparent 80%),#252423;color:white;padding-top:62px;display:flex;flex-direction:column;align-items:center}#incoming .call-label{color:#ddd;font-size:12px;letter-spacing:0;order:0;margin:0}#incoming .avatar{order:1;margin:42px auto 20px;width:91px;height:91px;background:#111;border:0;border-radius:50%;overflow:hidden}#incoming h2{order:2;font-size:29px;margin:0;font-weight:600;color:white}#incoming .call-role{order:3;color:#ddd;margin:12px 15px 0;font-size:13px}#incoming #phone-status{order:4;color:white;margin-top:15px;font-size:18px}#incoming .call-actions{bottom:14%;left:16%;right:16%}#incoming .call-actions small{color:white}#incoming .green{background:#34c759}#incoming .red{background:#ed1835}.screen:has(#incoming:not([hidden])) .home-bar{background:white}
+/* Indeed ringing state: repeating dots stop once the call is answered or ended. */
+#incoming{background:radial-gradient(ellipse at 15% 70%,#2557a7,transparent 85%),linear-gradient(155deg,#123f85,#071f4a)}
+#incoming.ringing #phone-status::after{content:'...';display:inline-block;width:1.1em;overflow:hidden;vertical-align:bottom;white-space:nowrap;text-align:left;animation:ringing-dots 1.4s steps(4,end) infinite}
+@keyframes ringing-dots{0%{clip-path:inset(0 100% 0 0)}25%{clip-path:inset(0 66% 0 0)}50%{clip-path:inset(0 33% 0 0)}75%,100%{clip-path:inset(0 0 0 0)}}
+@media(prefers-reduced-motion:reduce){#incoming.ringing #phone-status::after{animation:none;clip-path:none}}
