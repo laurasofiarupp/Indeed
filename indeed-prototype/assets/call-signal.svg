@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 24">
+<style>
+rect { fill: #b5d5cd; transform-box: fill-box; transform-origin: center bottom; animation: wave 1s ease-in-out infinite; }
+rect:nth-child(2) { animation-delay: .16s; }
+rect:nth-child(3) { animation-delay: .32s; }
+@keyframes wave { 0%,100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+@media(prefers-reduced-motion:reduce) { rect { animation:none; } }
+</style>
+<rect x="1" y="14" width="4" height="10"/><rect x="9" y="7" width="4" height="17"/><rect x="17" y="0" width="4" height="24"/>
+</svg>
