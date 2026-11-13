@@ -4,7 +4,7 @@ const incoming=document.querySelector('#incoming');
 const status=document.querySelector('#phone-status');
 const actions=document.querySelector('.call-actions');
 const channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('indeed-c2c-call'):null;
-let ringTimer,elapsedTimer;
+let ringTimer,elapsedTimer,returnTimer,callSeconds=0;
 const connectedControls=document.querySelector('.connected-controls');
 function resetConnectedControls(){clearInterval(elapsedTimer);connectedControls.hidden=true;connectedControls.querySelectorAll('button[aria-pressed]').forEach(button=>{button.setAttribute('aria-pressed','false');});}
 
@@ -25,6 +25,7 @@ function openMessages(){
  pulse.finished.then(()=>{if(token!==openingToken)return;showMessages();cancelOpening();}).catch(()=>{});
 }
 function startNotification(){
+ clearTimeout(returnTimer);callSeconds=0;
  resetConnectedControls();
  cancelOpening();
  clearTimeout(ringTimer);
@@ -33,10 +34,16 @@ function startNotification(){
  document.querySelector('#message-list').querySelectorAll('.sent-message').forEach(el=>el.remove());
 
 }
-function finishCall(text){resetConnectedControls();incoming.classList.remove('ringing');cancelOpening();clearTimeout(ringTimer);lock.hidden=true;messages.hidden=false;incoming.hidden=true;status.textContent=text;actions.hidden=true;}
+function finishCall(text){
+ resetConnectedControls();incoming.classList.remove('ringing');cancelOpening();clearTimeout(ringTimer);clearTimeout(returnTimer);
+ lock.hidden=true;messages.hidden=true;incoming.hidden=false;actions.hidden=true;
+ const duration=Math.floor(callSeconds/60)+':'+String(callSeconds%60).padStart(2,'0');
+ status.textContent=text==='Call ended'?'Call ended · '+duration:text;
+ returnTimer=setTimeout(()=>{incoming.hidden=true;messages.hidden=false;},2000);
+}
 document.querySelector('.notification').addEventListener('click',openMessages);
 document.querySelector('#replay').addEventListener('click',startNotification);
-document.querySelector('#answer').addEventListener('click',()=>{incoming.classList.remove('ringing');status.textContent='Call in progress · 0:00';actions.hidden=true;connectedControls.hidden=false;let seconds=0;clearInterval(elapsedTimer);elapsedTimer=setInterval(()=>{seconds++;status.textContent='Call in progress · '+Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');},1000);channel?.postMessage('answered');});
+document.querySelector('#answer').addEventListener('click',()=>{incoming.classList.remove('ringing');status.textContent='Call in progress · 0:00';actions.hidden=true;connectedControls.hidden=false;callSeconds=0;clearInterval(elapsedTimer);elapsedTimer=setInterval(()=>{callSeconds++;status.textContent='Call in progress · '+Math.floor(callSeconds/60)+':'+String(callSeconds%60).padStart(2,'0');},1000);channel?.postMessage('answered');});
 document.querySelector('#decline').addEventListener('click',()=>{finishCall('Call declined');channel?.postMessage('declined');});
 document.querySelector('#message-form').addEventListener('submit',event=>{event.preventDefault();const input=document.querySelector('#message-input');if(!input.value.trim())return;const message=document.createElement('p');message.className='sent-message';message.textContent=input.value.trim();document.querySelector('#message-list').append(message);input.value='';message.scrollIntoView({block:'nearest'});});
 if(channel)channel.onmessage=({data})=>{if(data==='start')startNotification();if(data==='ended')finishCall('Call ended');};
