@@ -1,8 +1,7 @@
 # Indeed prototypes
 
-Three standalone browser prototypes:
+Two standalone browser prototypes:
 
-- [Indeed Employer](indeed-prototype/index.html)
 - [Indeed Call Request](indeed-call-request/index.html)
 - [Indeed Queued Calling](indeed-queued-calling/index.html)
 
