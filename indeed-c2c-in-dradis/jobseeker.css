@@ -3,3 +3,5 @@
 .call-actions button{display:grid;place-items:center;padding:0}.call-actions svg{width:31px;height:31px;display:block}.call-actions .red svg{transform:rotate(135deg)}.call-actions .green svg{transform:rotate(-8deg)}.call-actions small{font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-size:13px;font-weight:400;color:white;line-height:1.2}.call-actions button:focus-visible{outline:3px solid white;outline-offset:5px}
 
 .shortcuts svg{display:block;width:25px;height:25px}.shortcuts span:first-child svg{width:24px;height:28px}
+
+.indeed-icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}.indeed-icon img{display:block;width:17px;height:21px;object-fit:contain}
