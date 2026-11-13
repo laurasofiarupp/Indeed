@@ -292,6 +292,7 @@ function callPrompt() {
 }));
 }
 function endCall() {
+  jobseekerChannel?.postMessage('ended');
   if (callPhase === 'countdown' || callPhase === 'calling') {
     clearInterval(callInterval);
     clearTimeout(callTimeout);
@@ -309,7 +310,9 @@ function endCall() {
   callPanel.querySelectorAll('button').forEach(button => button.disabled = true);
   callTimeout = setTimeout(callPrompt, 1600);
 }
+const jobseekerChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('indeed-c2c-call') : null;
 document.querySelector('#call').addEventListener('click', () => {
+  jobseekerChannel?.postMessage('start');
   clearInterval(callInterval);
   clearTimeout(callTimeout);
   interestTip.hidden = true;
@@ -343,7 +346,7 @@ document.querySelector('#call').addEventListener('click', () => {
           callSeconds++;
           callPanel.querySelector('.call-status').textContent = 'Call in progress  ' + durationText();
         }, 1000);
-      }, 1800);
+      }, 4000);
     }
   }, 1000);
 });
