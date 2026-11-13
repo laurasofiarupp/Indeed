@@ -38,3 +38,5 @@
 .screen .notch,.screen .ios-status{display:none!important}
 
 .safari-address{margin-top:10px;margin-bottom:10px}
+
+.safari-address>span:last-child{font-size:15px;line-height:1;display:inline-flex;align-items:center;justify-content:center;min-width:18px}
