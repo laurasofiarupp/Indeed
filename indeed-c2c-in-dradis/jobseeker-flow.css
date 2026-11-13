@@ -33,3 +33,6 @@
 .scheduling-message{margin:20px 0 12px}.schedule-body{margin:8px 0 0 28px;font-size:12px;line-height:1.5;color:#444}.schedule-body>p{margin:0 0 10px}.schedule-details{color:#767676;font-size:10px}.schedule-day{margin-top:17px}.schedule-day h3{font-size:11px;font-weight:600;margin:0 0 8px}.schedule-slots{display:flex;flex-wrap:wrap;gap:7px}.schedule-slots button{background:#f0f5ff;border:1px solid #b4c9ed;border-radius:20px;color:#003a9b;font:600 11px Arial;padding:9px 13px;cursor:pointer}.schedule-slots button:focus-visible{outline:2px solid #003a9b;outline-offset:2px}.schedule-slots button[aria-pressed=true]{background:#003a9b;color:white}.schedule-slots button:disabled:not([aria-pressed=true]){opacity:.5;cursor:default}
 
 .thread-scroll{padding-bottom:28px;scroll-padding-bottom:28px}.thread-scroll>.system-confirmation:last-child{margin-bottom:10px}
+
+/* Remove device hardware and status chrome from all states. */
+.screen .notch,.screen .ios-status{display:none!important}
