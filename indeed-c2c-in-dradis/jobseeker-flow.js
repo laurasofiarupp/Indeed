@@ -5,7 +5,7 @@ const status=document.querySelector('#phone-status');
 const interestPrompt=document.querySelector('#interest-prompt');
 const actions=document.querySelector('.call-actions');
 const channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('indeed-c2c-call'):null;
-let ringTimer,elapsedTimer,returnTimer,notificationTimer,callSeconds=0;
+let ringTimer,elapsedTimer,returnTimer,notificationTimer,scheduleTimer,callSeconds=0;
 const connectedControls=document.querySelector('.connected-controls');
 function resetConnectedControls(){clearInterval(elapsedTimer);connectedControls.hidden=true;connectedControls.querySelectorAll('button[aria-pressed]').forEach(button=>{button.setAttribute('aria-pressed','false');});}
 
@@ -26,6 +26,7 @@ function openMessages(){
  pulse.finished.then(()=>{if(token!==openingToken)return;showMessages();cancelOpening();}).catch(()=>{});
 }
 function startNotification(){
+ clearTimeout(scheduleTimer);document.querySelectorAll('.scheduling-message').forEach(el=>el.remove());
  clearTimeout(notificationTimer);
  const notification=document.querySelector('.notification');
  notification.hidden=true;
@@ -63,15 +64,34 @@ for(const [id,onLabel,offLabel] of [['call-camera','Turn camera off','Turn camer
 document.querySelector('#call-end').addEventListener('click',()=>{finishCall('Call ended');channel?.postMessage('ended');});
 
 function chooseInterest(interested){
+ clearTimeout(scheduleTimer);
 
  clearTimeout(ringTimer);clearTimeout(returnTimer);cancelOpening();resetConnectedControls();incoming.classList.remove('ringing');document.querySelector('#availability-prompt').hidden=true;
  interestPrompt.hidden=true;incoming.hidden=true;messages.hidden=false;
  const response=document.createElement('p');response.className='sent-message system-confirmation';response.setAttribute('role','status');response.textContent=interested?'We’ve let Haru know you can’t talk right now, but you’re still interested in talking with them.':'We’ve let Haru know you’re no longer interested in talking with them.';
  document.querySelector('#message-list').append(response);response.scrollIntoView({block:'nearest'});
  channel?.postMessage(interested?'still-interested':'not-interested');
+ if(interested)scheduleTimer=setTimeout(showScheduling,3000);
 }
 document.querySelector('#still-interested').addEventListener('click',()=>chooseInterest(true));
 document.querySelector('#not-interested').addEventListener('click',()=>chooseInterest(false));
 
 document.querySelector('#available-later').addEventListener('click',()=>chooseInterest(true));
 document.querySelector('#unavailable').addEventListener('click',()=>chooseInterest(false));
+
+function showScheduling(){
+ const card=document.createElement('article');card.className='scheduling-message';
+ card.innerHTML='<div class="sender"><span class="sender-avatar"><img src="assets/haru-logo.svg" alt="Haru"></span><strong>Hiring team</strong></div><div class="schedule-body"><p>We’re interested in talking with you. Please select a date and time that works best for you.</p><p class="schedule-details">30-minute call · Central Time</p></div>';
+ const days=[['Thursday, December 3, 2026',['9:00 AM','11:00 AM','2:00 PM']],['Friday, December 4, 2026',['10:00 AM','3:00 PM']],['Saturday, December 5, 2026',['9:00 AM','10:00 AM','11:30 AM','1:00 PM','3:30 PM']]];
+ const body=card.querySelector('.schedule-body');
+ for(const [day,times] of days){
+  const group=document.createElement('div');group.className='schedule-day';const heading=document.createElement('h3');heading.textContent=day;group.append(heading);
+  const slots=document.createElement('div');slots.className='schedule-slots';
+  for(const time of times){const button=document.createElement('button');button.type='button';button.textContent=time;button.setAttribute('aria-label',day+' at '+time+', 30-minute call');button.addEventListener('click',()=>{
+   card.querySelectorAll('button').forEach(el=>{el.disabled=true;el.setAttribute('aria-pressed',String(el===button));});
+   const confirmation=document.createElement('p');confirmation.className='sent-message system-confirmation scheduling-message';confirmation.setAttribute('role','status');confirmation.textContent='Your call with Haru has been set for '+day+' at '+time+' Central Time. The call will last 30 minutes.';document.querySelector('#message-list').append(confirmation);confirmation.scrollIntoView({block:'nearest',behavior:'smooth'});channel?.postMessage({type:'scheduled',day,time});
+  });slots.append(button);}
+  group.append(slots);body.append(group);
+ }
+ document.querySelector('#message-list').append(card);card.scrollIntoView({block:'start',behavior:'smooth'});
+}
