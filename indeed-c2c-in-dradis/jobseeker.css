@@ -8,3 +8,5 @@
 
 /* Frameless, square-edged phone preview. */
 .phone{padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}.screen{border-radius:0}
+
+.notch{display:none}
