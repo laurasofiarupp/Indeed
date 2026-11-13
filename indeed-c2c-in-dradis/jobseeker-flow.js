@@ -26,6 +26,7 @@ function openMessages(){
  pulse.finished.then(()=>{if(token!==openingToken)return;showMessages();cancelOpening();}).catch(()=>{});
 }
 function startNotification(){
+ document.querySelector('#availability-prompt').hidden=false;
  interestPrompt.hidden=true;
  clearTimeout(returnTimer);callSeconds=0;
  resetConnectedControls();
@@ -57,10 +58,14 @@ for(const [id,onLabel,offLabel] of [['call-camera','Turn camera off','Turn camer
 document.querySelector('#call-end').addEventListener('click',()=>{finishCall('Call ended');channel?.postMessage('ended');});
 
 function chooseInterest(interested){
+ clearTimeout(ringTimer);clearTimeout(returnTimer);cancelOpening();resetConnectedControls();incoming.classList.remove('ringing');document.querySelector('#availability-prompt').hidden=true;
  interestPrompt.hidden=true;incoming.hidden=true;messages.hidden=false;
- const response=document.createElement('p');response.className='sent-message';response.textContent=interested?'Yes, I’m still interested in talking with Haru.':'No, I’m no longer interested in talking with Haru.';
+ const response=document.createElement('p');response.className='sent-message';response.textContent=interested?'I can’t talk right now, but I’m still interested in talking with Haru.':'No, I’m no longer interested in talking with Haru.';
  document.querySelector('#message-list').append(response);response.scrollIntoView({block:'nearest'});
  channel?.postMessage(interested?'still-interested':'not-interested');
 }
 document.querySelector('#still-interested').addEventListener('click',()=>chooseInterest(true));
 document.querySelector('#not-interested').addEventListener('click',()=>chooseInterest(false));
+
+document.querySelector('#available-later').addEventListener('click',()=>chooseInterest(true));
+document.querySelector('#unavailable').addEventListener('click',()=>chooseInterest(false));
