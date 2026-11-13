@@ -2,6 +2,7 @@ const lock=document.querySelector('#lock');
 const messages=document.querySelector('#messages');
 const incoming=document.querySelector('#incoming');
 const status=document.querySelector('#phone-status');
+const interestPrompt=document.querySelector('#interest-prompt');
 const actions=document.querySelector('.call-actions');
 const channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('indeed-c2c-call'):null;
 let ringTimer,elapsedTimer,returnTimer,callSeconds=0;
@@ -25,6 +26,7 @@ function openMessages(){
  pulse.finished.then(()=>{if(token!==openingToken)return;showMessages();cancelOpening();}).catch(()=>{});
 }
 function startNotification(){
+ interestPrompt.hidden=true;
  clearTimeout(returnTimer);callSeconds=0;
  resetConnectedControls();
  cancelOpening();
@@ -44,7 +46,7 @@ function finishCall(text){
 document.querySelector('.notification').addEventListener('click',openMessages);
 document.querySelector('#replay').addEventListener('click',startNotification);
 document.querySelector('#answer').addEventListener('click',()=>{incoming.classList.remove('ringing');status.textContent='Call in progress · 0:00';actions.hidden=true;connectedControls.hidden=false;callSeconds=0;clearInterval(elapsedTimer);elapsedTimer=setInterval(()=>{callSeconds++;status.textContent='Call in progress · '+Math.floor(callSeconds/60)+':'+String(callSeconds%60).padStart(2,'0');},1000);channel?.postMessage('answered');});
-document.querySelector('#decline').addEventListener('click',()=>{finishCall('Call declined');channel?.postMessage('declined');});
+document.querySelector('#decline').addEventListener('click',()=>{resetConnectedControls();clearTimeout(ringTimer);clearTimeout(returnTimer);cancelOpening();incoming.classList.remove('ringing');incoming.hidden=true;lock.hidden=true;messages.hidden=false;interestPrompt.hidden=false;channel?.postMessage('declined');});
 document.querySelector('#message-form').addEventListener('submit',event=>{event.preventDefault();const input=document.querySelector('#message-input');if(!input.value.trim())return;const message=document.createElement('p');message.className='sent-message';message.textContent=input.value.trim();document.querySelector('#message-list').append(message);input.value='';message.scrollIntoView({block:'nearest'});});
 if(channel)channel.onmessage=({data})=>{if(data==='start')startNotification();if(data==='ended')finishCall('Call ended');};
 startNotification();
@@ -53,3 +55,12 @@ for(const [id,onLabel,offLabel] of [['call-camera','Turn camera off','Turn camer
  document.getElementById(id).addEventListener('click',event=>{const button=event.currentTarget;const active=button.getAttribute('aria-pressed')!=='true';button.setAttribute('aria-pressed',String(active));button.setAttribute('aria-label',active?onLabel:offLabel);});
 }
 document.querySelector('#call-end').addEventListener('click',()=>{finishCall('Call ended');channel?.postMessage('ended');});
+
+function chooseInterest(interested){
+ interestPrompt.hidden=true;incoming.hidden=true;messages.hidden=false;
+ const response=document.createElement('p');response.className='sent-message';response.textContent=interested?'Yes, I’m still interested in talking with Haru.':'No, I’m no longer interested in talking with Haru.';
+ document.querySelector('#message-list').append(response);response.scrollIntoView({block:'nearest'});
+ channel?.postMessage(interested?'still-interested':'not-interested');
+}
+document.querySelector('#still-interested').addEventListener('click',()=>chooseInterest(true));
+document.querySelector('#not-interested').addEventListener('click',()=>chooseInterest(false));
