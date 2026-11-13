@@ -5,7 +5,7 @@ const status=document.querySelector('#phone-status');
 const interestPrompt=document.querySelector('#interest-prompt');
 const actions=document.querySelector('.call-actions');
 const channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('indeed-c2c-call'):null;
-let ringTimer,elapsedTimer,returnTimer,callSeconds=0;
+let ringTimer,elapsedTimer,returnTimer,notificationTimer,callSeconds=0;
 const connectedControls=document.querySelector('.connected-controls');
 function resetConnectedControls(){clearInterval(elapsedTimer);connectedControls.hidden=true;connectedControls.querySelectorAll('button[aria-pressed]').forEach(button=>{button.setAttribute('aria-pressed','false');});}
 
@@ -26,6 +26,10 @@ function openMessages(){
  pulse.finished.then(()=>{if(token!==openingToken)return;showMessages();cancelOpening();}).catch(()=>{});
 }
 function startNotification(){
+ clearTimeout(notificationTimer);
+ const notification=document.querySelector('.notification');
+ notification.hidden=true;
+ notificationTimer=setTimeout(()=>{notification.hidden=false;},2000);
  document.querySelector('#interest-confirmation').hidden=true;
  document.querySelector('#availability-prompt').hidden=false;
  interestPrompt.hidden=true;
