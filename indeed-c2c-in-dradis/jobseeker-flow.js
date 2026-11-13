@@ -4,7 +4,7 @@ const incoming=document.querySelector('#incoming');
 const status=document.querySelector('#phone-status');
 const actions=document.querySelector('.call-actions');
 const channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('indeed-c2c-call'):null;
-let ringTimer,deadline,elapsedTimer;
+let ringTimer,elapsedTimer;
 const connectedControls=document.querySelector('.connected-controls');
 function resetConnectedControls(){clearInterval(elapsedTimer);connectedControls.hidden=true;connectedControls.querySelectorAll('button[aria-pressed]').forEach(button=>{button.setAttribute('aria-pressed','false');});}
 
@@ -13,7 +13,7 @@ function cancelOpening(){openingToken++;openingAnimations.forEach(animation=>ani
 function openMessages(){
  if(lock.hidden||openingAnimations.length)return;
  const notification=document.querySelector('.notification');
- const showMessages=()=>{lock.hidden=true;messages.hidden=false;incoming.hidden=true;};
+ const showMessages=()=>{lock.hidden=true;messages.hidden=false;incoming.hidden=true;clearTimeout(ringTimer);ringTimer=setTimeout(()=>{cancelOpening();messages.hidden=true;incoming.hidden=false;incoming.classList.add('ringing');},5000);};
  if(matchMedia('(prefers-reduced-motion: reduce)').matches||!notification.animate){showMessages();return;}
  const token=++openingToken;
  const pulse=notification.animate([
@@ -27,13 +27,13 @@ function openMessages(){
 function startNotification(){
  resetConnectedControls();
  cancelOpening();
- clearTimeout(ringTimer);deadline=Date.now()+11000;
+ clearTimeout(ringTimer);
  lock.hidden=false;messages.hidden=true;incoming.hidden=true;actions.hidden=false;
  status.textContent='Incoming call';incoming.classList.remove('ringing');
  document.querySelector('#message-list').querySelectorAll('.sent-message').forEach(el=>el.remove());
- ringTimer=setTimeout(()=>{cancelOpening();lock.hidden=true;messages.hidden=true;incoming.hidden=false;incoming.classList.add('ringing');},11000);
+
 }
-function finishCall(text){resetConnectedControls();incoming.classList.remove('ringing');cancelOpening();clearTimeout(ringTimer);lock.hidden=true;messages.hidden=true;incoming.hidden=false;status.textContent=text;actions.hidden=true;}
+function finishCall(text){resetConnectedControls();incoming.classList.remove('ringing');cancelOpening();clearTimeout(ringTimer);lock.hidden=true;messages.hidden=false;incoming.hidden=true;status.textContent=text;actions.hidden=true;}
 document.querySelector('.notification').addEventListener('click',openMessages);
 document.querySelector('#replay').addEventListener('click',startNotification);
 document.querySelector('#answer').addEventListener('click',()=>{incoming.classList.remove('ringing');status.textContent='Call in progress · 0:00';actions.hidden=true;connectedControls.hidden=false;let seconds=0;clearInterval(elapsedTimer);elapsedTimer=setInterval(()=>{seconds++;status.textContent='Call in progress · '+Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');},1000);channel?.postMessage('answered');});
